@@ -12,7 +12,6 @@
  <!-- Bootstrap core CSS -->
  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-
   {% block style %}
   {% endblock style %}
 </head>
@@ -23,6 +22,9 @@
    <ul class="navbar-nav mr-auto">
     <li class="nav-item">
       <a class="nav-link" href="{{url_for('post_all')}}">All Posts</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{url_for('create_entry')}}">Add entry</a>
     </li>
    </ul>
    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
