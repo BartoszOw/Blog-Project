@@ -86,7 +86,7 @@ def unpublished_list():
 
 
 @app.route('/delete_entry', methods=['POST'])
-
+@login_required
 def delete_entry():
     entry_id = request.form.get('entry_id') 
     if entry_id:
