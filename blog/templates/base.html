@@ -5,7 +5,7 @@
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
  <meta name="description" content="">
- <title>Mój pierwszy blog</title>
+ <title>Bart Blog</title>
 
  <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
 
@@ -17,56 +17,52 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="{{ url_for('index') }}">My blog</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
-        aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('post_all') }}">All Posts</a>
-            </li>
-            {% if session.logged_in %}
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('create_entry') }}">Add entry</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('unpublished_list') }}">Unpublished entries</a>
-          </li>
-            {% endif %}
-        </ul>
-    </div>
-
-   <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav mr-auto">
-    </ul>
-    <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="text" placeholder="Search.." aria-label="Szukaj">
-        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-    </form>
-    <ul class="navbar-nav ml-auto"> 
-        <li class="nav-item">
-          {% if session.logged_in %}
-            <form class="form-inline my-2 my-lg-0" action="{{ url_for('logout') }}" method="POST">
-              <button class="btn btn-danger my-2 my-sm-0" type="submit">Log Out</button>
-            </form>
-          {% else %}
-            <a class="btn btn-success my-2 my-lg-0 " href="{{ url_for('login') }}">Login</a>
-          {% endif %}
-        </li>
-    </ul>
-</div>
- </nav>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="{{ url_for('index') }}">Bart Blog</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+          aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+          <ul class="navbar-nav mr-auto">
+              <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('post_all') }}">All Posts</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Movies 
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  {% for li in list_types %}
+                    <a class="dropdown-item" href="{{url_for('movies', list_type=li.type)}}">{{li.name}}</a>
+                  {% endfor %}
+                </div>
+              </li>
+          </ul>
+          <form class="form-inline my-2 my-lg-0">
+              <input class="form-control mr-sm-2" type="text" placeholder="Search.." aria-label="Szukaj">
+              <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+          </form>
+          <ul class="navbar-nav ml-auto"> 
+              <li class="nav-item">
+                {% if session.logged_in %}
+                  <form class="form-inline my-2 my-lg-0" action="{{ url_for('logout') }}" method="POST">
+                    <button class="btn btn-danger my-2 my-sm-0" type="submit">Log Out</button>
+                  </form>
+                {% else %}
+                  <a class="btn btn-success my-2 my-lg-0 " href="{{ url_for('login') }}">Login</a>
+                {% endif %}
+              </li>
+          </ul>
+      </div>
+    </nav>
 
  <main role="main" class="container">
-
    {% block content %}
    {% endblock %}
-
- </main><!-- /.container -->
+ </main>
  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
    crossorigin="anonymous"></script>

@@ -4,7 +4,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'remember-to-add-key'
-
+    API_TOKEN = os.environ.get("TMDB_API_TOKEN", "")
 
     SQLALCHEMY_DATABASE_URI = (
         os.environ.get('DATABASE_URL') or

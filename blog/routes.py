@@ -2,8 +2,35 @@ from flask import render_template, request, redirect, url_for, flash, session
 from blog import app
 from blog.models import Entry, db
 from blog.forms import EntryForm, LoginForm
+import tmdb_client
 import datetime
 import functools
+
+LIST_TYPES = [
+    {'name': "Now Playing", 'type': "now_playing"},
+    {'name': "Top Rated", 'type': "top_rated"},
+    {'name': "Upcoming", 'type': "upcoming"},
+    {'name': "Popular", 'type': "popular"}
+]
+
+
+def get_list_types():
+    return LIST_TYPES
+
+
+@app.context_processor
+def inject_list_types():
+    return dict(list_types=get_list_types())
+
+@app.context_processor
+def utility_processor():
+
+    def tmdb_image_url(path,size):
+        return tmdb_client.get_poster_url(path,size)
+    
+    return {'tmdb_image_url': tmdb_image_url}
+
+
 
 def login_required(view_func):
     @functools.wraps(view_func)
@@ -12,6 +39,21 @@ def login_required(view_func):
             return view_func(*args, **kwargs)
         return redirect(url_for('login', next=request.path))
     return check_permissions
+
+
+@app.route('/movies')
+def movies():
+    selected_list = request.args.get('list_type', 'popular')
+
+    valid_list_types = [lst['type'] for lst in LIST_TYPES]
+
+    if selected_list not in valid_list_types:
+        return redirect(url_for('movies', list_type='popular'))
+    
+    movies = tmdb_client.get_movies(16, list_type=selected_list)
+
+    return render_template('movies.html', movies=movies, list=LIST_TYPES, selected_list=selected_list)
+
 
 @app.route('/')
 def index():
