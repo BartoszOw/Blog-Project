@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, BooleanField, PasswordField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Email
 from config import Config
 from werkzeug.routing import ValidationError
 
@@ -22,3 +22,9 @@ class LoginForm(FlaskForm):
         if field.data != Config.ADMIN_PASSWORD:
             raise ValidationError('Invalid Password')
         return field.data
+    
+
+class ContactForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    message = TextAreaField('Message', validators=[DataRequired()])

@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from blog import app
 from blog.models import Entry, db
-from blog.forms import EntryForm, LoginForm
+from blog.forms import EntryForm, LoginForm, ContactForm
 import tmdb_client
 import datetime
 import functools
@@ -144,3 +144,15 @@ def delete_entry():
     else:
         return redirect(url_for('index'))
     
+
+@app.route('/contact', methods=['GET','POST'])
+def contact():
+    form = ContactForm()
+    if request.method == "POST":
+        if form.validate_on_submit():
+            name = form.name.data
+            email = form.email.data
+            message = form.message.data
+
+    
+    return render_template('contact.html', form=form)

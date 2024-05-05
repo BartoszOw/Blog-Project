@@ -2,7 +2,7 @@
 {% block style %}
 <style>
     .row {
-        margin-top: 50px;
+        margin-top: 70px;
     }
     .list-name {
         margin-bottom: 20px;
@@ -11,18 +11,14 @@
 {% endblock style %}
 {% block content %}
 <div class="row">
-    <div class="col-lg-12 text-center list-name">
-        <h1 class="mt-5">
-            {% if selected_list == 'popular' %}
-            Popular
-            {% elif selected_list == 'top_rated' %}
-                Top Rated
-            {% elif selected_list == 'now_playing' %}
-                Now Playing
-            {% elif selected_list == 'upcoming' %}
-                Upcoming
-            {% endif %}
-        </h1>
+    <div class="col-lg-12 center list-name">
+        <ul class="nav nav-tabs">
+            {% for li in list_types %}
+            <li class="nav-item">
+                <a class="nav-link {% if li.type == selected_list %}active{% endif %}"  href="{{url_for('movies', list_type=li.type)}}">{{li.name}}</a>
+            </li>
+            {% endfor %}
+          </ul>
     </div>
     {% for movie in movies %}
     <div class="col-lg-3 col-md-6 mb-4 ">

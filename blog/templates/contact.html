@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block style %}
+<style>
+    .info-contact {
+        margin: 100px 0 100px 0;
+    }
+    .btn-submit {
+        display: flex;
+        justify-content: center;
+        margin-top: 50px;
+    }
+</style>
+{% endblock style %}
+{% block content %}
+<div>
+    <div class="row justify-content-center info-contact">
+        <h1>Contact to me!</h1>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div>
+                    {{ form.name.label }} {{ form.name(class_='form-control') }}
+                </div>
+                <div>
+                    {{ form.email.label }} {{ form.email(class_='form-control') }}
+                </div>
+                <div>
+                    {{ form.message.label }} {{ form.message(class_='form-control') }}
+                </div>
+                <div class="btn-submit">
+                    <button type="submit">Send It</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

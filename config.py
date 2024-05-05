@@ -15,3 +15,4 @@ class Config:
 
     ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
     ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin')
+    PRIMARY_MAIL = os.environ.get('PRIMARY_MAIL', 'owbartosz.pl@gmail.com')
