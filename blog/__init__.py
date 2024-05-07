@@ -14,5 +14,7 @@ from blog import routes, models
 def make_shell_context():
     return {
         'db': db,
-        'Entry': models.Entry
+        'Entry': models.Entry,
+        'Comment': models.Comment
     }
+

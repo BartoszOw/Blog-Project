@@ -8,3 +8,9 @@ class Entry(db.Model):
     pub_date = db.Column(db.DateTime, nullable=False,
                          default=datetime.datetime.utcnow)
     is_published = db.Column(db.Boolean, default=False)
+    comments = db.relationship('Comment', backref='entry', lazy=True)
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=False)
+    entry_id = db.Column(db.Integer, db.ForeignKey('entry.id'), nullable=False)

@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from blog import app
-from blog.models import Entry, db
+from blog.models import Entry, Comment, db
 from blog.forms import EntryForm, LoginForm, ContactForm
 import tmdb_client
 import datetime
@@ -12,7 +12,12 @@ LIST_TYPES = [
     {'name': "Upcoming", 'type': "upcoming"},
     {'name': "Popular", 'type': "popular"}
 ]
-
+CATEGORIES = [
+    {'name': 'Sport', 'type' : 1},
+    {'name': 'Food', 'type' : 2},
+    {'name': 'Lifestyle', 'type' : 3},
+    {'name': 'Games', 'type' : 4}
+]
 
 def get_list_types():
     return LIST_TYPES
@@ -58,9 +63,11 @@ def movies():
 @app.route('/')
 def index():
     all_posts = Entry.query.filter_by(is_published=True).order_by(Entry.pub_date.desc()).limit(4).all()
-    return render_template('homepage.html', all_posts=all_posts)
 
-@app.route('/post_all')
+    comments_count = {entry.id: len(entry.comments) for entry in all_posts}
+    return render_template('homepage.html', all_posts=all_posts, comments_count=comments_count)
+
+@app.route('/post_all') 
 def post_all():
     all_posts = Entry.query.filter_by(is_published=True).order_by(Entry.pub_date.desc())
     return render_template('homepage.html', all_posts=all_posts)
