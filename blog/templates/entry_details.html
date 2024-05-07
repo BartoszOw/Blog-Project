@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block style %}
+    <style>
+        .box {
+            margin-top: 100px;
+        }
+    </style>
+{% endblock style %}
+{% block content %}
+<div class="box">
+    <a href="{{ url_for('post_all') }}" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-90deg-left" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M1.146 4.854a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H12.5A2.5 2.5 0 0 1 15 6.5v8a.5.5 0 0 1-1 0v-8A1.5 1.5 0 0 0 12.5 5H2.707l3.147 3.146a.5.5 0 1 1-.708.708z"/>
+      </svg>
+    </a>
+    <h2 class="my-4">
+        Title:<br> <span style="font-weight: lighter;">{{entry.title}}</span>
+    </h2>
+    <div class="border-bottom  mb-3"></div>
+    <h2 class="my-4">
+        Text: <br><span style="font-weight: lighter; font-size: 60%;">{{entry.body}}</span>
+    </h2>
+</div>
+<div class="border-bottom  mb-3"></div>
+
+<div class="comment-section-add my-4">
+    {% if session.logged_in %}
+    <form method="POST">
+        {{ form.csrf_token }}
+        <h4>Add a new comment</h4>
+        {{ form.text(class_='form-control') }}<br>
+        <button type="submit" class="btn btn-success">Add</button>
+    </form>
+    
+</div>
+    <div class="border-bottom  mb-3"></div>
+    {% endif %}
+    {% for com in comments %}
+        <div class="my-4 lead" padding:0 15px 0 15px;">
+            <blockquote class="blockquote">
+                <p class="mb-0"><strong>{{com.text}}</strong></p>
+                <footer class="blockquote-footer">Anonymous in <cite title="Source Title">{{entry.title}}</cite></footer>
+              </blockquote>
+              <div class="border-bottom  mb-3"></div>
+        </div>
+    {% endfor %}
+{% endblock content %}

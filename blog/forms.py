@@ -9,6 +9,9 @@ class EntryForm(FlaskForm):
     body = TextAreaField('Content', validators=[DataRequired()])
     is_published = BooleanField('Is Published?')
 
+class CommentForm(FlaskForm):
+    text = StringField('Text', validators=[DataRequired()])
+    
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])

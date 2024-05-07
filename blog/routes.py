@@ -1,7 +1,7 @@
-from flask import render_template, request, redirect, url_for, flash, session
+from flask import render_template, request,abort, redirect, url_for, flash, session
 from blog import app
 from blog.models import Entry, Comment, db
-from blog.forms import EntryForm, LoginForm, ContactForm
+from blog.forms import EntryForm, LoginForm, ContactForm, CommentForm
 import tmdb_client
 import datetime
 import functools
@@ -11,12 +11,6 @@ LIST_TYPES = [
     {'name': "Top Rated", 'type': "top_rated"},
     {'name': "Upcoming", 'type': "upcoming"},
     {'name': "Popular", 'type': "popular"}
-]
-CATEGORIES = [
-    {'name': 'Sport', 'type' : 1},
-    {'name': 'Food', 'type' : 2},
-    {'name': 'Lifestyle', 'type' : 3},
-    {'name': 'Games', 'type' : 4}
 ]
 
 def get_list_types():
@@ -34,8 +28,6 @@ def utility_processor():
         return tmdb_client.get_poster_url(path,size)
     
     return {'tmdb_image_url': tmdb_image_url}
-
-
 
 def login_required(view_func):
     @functools.wraps(view_func)
@@ -59,30 +51,56 @@ def movies():
 
     return render_template('movies.html', movies=movies, list=LIST_TYPES, selected_list=selected_list)
 
+def posts(limit=None):
 
-@app.route('/')
-def index():
-    all_posts = Entry.query.filter_by(is_published=True).order_by(Entry.pub_date.desc()).limit(4).all()
+    if limit is None:
+        all_posts = Entry.query.filter_by(is_published=True).order_by(Entry.pub_date.desc()).all()
+    else:
+        all_posts = Entry.query.filter_by(is_published=True).order_by(Entry.pub_date.desc()).limit(limit).all()
 
     comments_count = {entry.id: len(entry.comments) for entry in all_posts}
     return render_template('homepage.html', all_posts=all_posts, comments_count=comments_count)
 
+@app.route('/')
+def index():
+    return posts(limit=4)
+
 @app.route('/post_all') 
 def post_all():
-    all_posts = Entry.query.filter_by(is_published=True).order_by(Entry.pub_date.desc())
-    return render_template('homepage.html', all_posts=all_posts)
+    return posts()
+
+@app.route('/post/<post_id>', methods=['GET', 'POST'])
+def entry_details(post_id):
+    entry = Entry.query.get(post_id)
+    all_comments = Comment.query.filter_by(entry_id=post_id).order_by(Comment.id.desc()).all()
+    
+    if entry is None:
+        abort(404)
+
+    form = CommentForm()
+    if request.method == "POST":
+        if form.validate_on_submit():
+            text = form.text.data
+            comment = Comment(text=text, entry_id=post_id)
+            db.session.add(comment)
+            db.session.commit()
+            flash('Your comment has been added!', category='success')
+            return redirect(request.url)
+        else:
+            flash('Error adding comment. Please check your input.', 'error')
+    return render_template('entry_details.html', entry=entry, form=form, comments=all_comments)
 
 @app.route('/new_post', methods=['GET','POST'])
 @login_required
 def create_entry():
-    return manage_entry(entry_id=None)
+    return manage_entry(entry_id=None, action='Add a new Entry')
 
 @app.route('/edit_post/<int:entry_id>', methods=["GET", "POST"])
 @login_required
 def edit_entry(entry_id):
-    return manage_entry(entry_id)
+    return manage_entry(entry_id, action='Modify a Entry')
 
-def manage_entry(entry_id):
+def manage_entry(entry_id, action):
     entry = None
     if entry_id:
         entry = Entry.query.get_or_404(entry_id)
@@ -101,7 +119,8 @@ def manage_entry(entry_id):
     else:
         errors = form.errors
     
-    return render_template('entry_form.html', form=form, errors=errors)
+    return render_template('entry_form.html', form=form, errors=errors, action=action)
+
 
 
 @app.route('/login/', methods=['GET', 'POST'])
@@ -140,6 +159,7 @@ def delete_entry():
     entry_id = request.form.get('entry_id') 
     if entry_id:
         entry = Entry.query.get_or_404(entry_id)
+        Comment.query.filter_by(entry_id=entry_id).delete()
         db.session.delete(entry)
         db.session.commit()
         flash("Entry has been deleted", category="success")
