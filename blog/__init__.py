@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, session
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -15,6 +15,8 @@ def make_shell_context():
     return {
         'db': db,
         'Entry': models.Entry,
-        'Comment': models.Comment
+        'Comment': models.Comment,
+        'Account': models.Account,
+        'session': session
     }
 

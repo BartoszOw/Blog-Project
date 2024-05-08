@@ -1,5 +1,5 @@
 from faker import Faker
-from blog.models import Entry, db, Comment
+from blog.models import Entry, db, Comment, Account
 from blog import app,db
 def generate_entries(how_many=10):
     fake = Faker()
@@ -28,7 +28,19 @@ def generate_comments(how_many=5):
             db.session.add(comment)
     db.session.commit()
 
+def generate_accounts(how_many=5):
+    fake = Faker()
+
+    for i in range(how_many):
+        account = Account(
+            username=fake.user_name(),
+            password=fake.password()
+        )
+        db.session.add(account)
+    db.session.commit()
+
 #with app.app_context():
+#    generate_accounts()
 #    generate_entries()
 #    generate_comments()
 

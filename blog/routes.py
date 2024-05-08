@@ -1,6 +1,7 @@
 from flask import render_template, request,abort, redirect, url_for, flash, session
+from flask_login import login_user
 from blog import app
-from blog.models import Entry, Comment, db
+from blog.models import Entry, Comment, db, Account
 from blog.forms import EntryForm, LoginForm, ContactForm, CommentForm
 import tmdb_client
 import datetime
@@ -15,7 +16,6 @@ LIST_TYPES = [
 
 def get_list_types():
     return LIST_TYPES
-
 
 @app.context_processor
 def inject_list_types():
@@ -34,22 +34,22 @@ def login_required(view_func):
     def check_permissions(*args,**kwargs):
         if session.get('logged_in'):
             return view_func(*args, **kwargs)
-        return redirect(url_for('login', next=request.path))
+        return redirect(url_for('login_page', next=request.path))
     return check_permissions
 
 
-@app.route('/movies')
-def movies():
-    selected_list = request.args.get('list_type', 'popular')
-
+@app.route('/<select_list>')
+@login_required
+def movies_page(select_list):
+    
     valid_list_types = [lst['type'] for lst in LIST_TYPES]
 
-    if selected_list not in valid_list_types:
+    if select_list not in valid_list_types:
         return redirect(url_for('movies', list_type='popular'))
     
-    movies = tmdb_client.get_movies(16, list_type=selected_list)
+    movies = tmdb_client.get_movies(16, list_type=select_list)
 
-    return render_template('movies.html', movies=movies, list=LIST_TYPES, selected_list=selected_list)
+    return render_template('movies.html', movies=movies, list=LIST_TYPES, selected_list=select_list)
 
 def posts(limit=None):
 
@@ -90,6 +90,8 @@ def entry_details(post_id):
             flash('Error adding comment. Please check your input.', 'error')
     return render_template('entry_details.html', entry=entry, form=form, comments=all_comments)
 
+
+
 @app.route('/new_post', methods=['GET','POST'])
 @login_required
 def create_entry():
@@ -121,31 +123,6 @@ def manage_entry(entry_id, action):
     
     return render_template('entry_form.html', form=form, errors=errors, action=action)
 
-
-
-@app.route('/login/', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    errors = None
-    next_url = request.args.get('next')
-    if request.method == "POST":
-        if form.validate_on_submit():
-            session['logged_in'] = True
-            session.permanent = True
-            flash("You are now logged in.", category="success")
-            return redirect(next_url or url_for('index'))
-        else:
-            errors = form.errors
-    return render_template('login_form.html', form=form, errors=errors)
-
-
-@app.route('/logout/', methods=["GET","POST"])
-def logout():
-    if request.method == "POST":
-        session.clear()
-        flash('You are now logged out', category='danger')
-    return redirect(url_for('index'))   
-
 @app.route('/unpublished_list', methods=['GET'])
 @login_required
 def unpublished_list():
@@ -171,6 +148,35 @@ def delete_entry():
     else:
         return redirect(url_for('index'))
     
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login_page():
+    form = LoginForm()
+    errors = None
+    next_url = request.args.get('next')
+    if request.method == "POST":
+        if form.validate_on_submit():
+            username = form.username.data
+            password = form.password.data
+            account = Account.query.filter_by(username=username).first()
+            if account and account.password == password:
+                session['logged_in'] = True
+                session.permanent = True
+                flash("You are now logged in.", category="success")
+                return redirect(next_url or url_for('index'))
+            else:
+                errors = 'Invalid username or password'
+    return render_template('login_form.html', form=form, errors=errors)
+
+
+@app.route('/logout/', methods=["GET","POST"])
+def logout():
+    if request.method == "POST":
+        session.clear()
+        flash('You are now logged out', category='danger')
+    return redirect(url_for('index'))   
+
 
 @app.route('/contact', methods=['GET','POST'])
 def contact():

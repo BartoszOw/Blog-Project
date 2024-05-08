@@ -13,6 +13,6 @@ class Config:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
-    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin')
+    #ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+    #ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin')
     PRIMARY_MAIL = os.environ.get('PRIMARY_MAIL', 'owbartosz.pl@gmail.com')

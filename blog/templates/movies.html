@@ -15,7 +15,7 @@
         <ul class="nav nav-tabs">
             {% for li in list_types %}
             <li class="nav-item">
-                <a class="nav-link {% if li.type == selected_list %}active{% endif %}"  href="{{url_for('movies', list_type=li.type)}}">{{li.name}}</a>
+                <a class="nav-link {% if li.type == selected_list %}active{% endif %}"  href="{{url_for('movies_page', select_list=li.type)}}">{{li.name}}</a>
             </li>
             {% endfor %}
           </ul>

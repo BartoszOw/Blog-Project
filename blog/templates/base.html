@@ -5,7 +5,7 @@
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
  <meta name="description" content="">
- <title>Bart Blog</title>
+ <title>Bart Card</title>
 
  <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
 
@@ -19,7 +19,7 @@
 <body>
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="{{ url_for('index') }}">Bart Blog</a>
+      <a class="navbar-brand" href="{{ url_for('index') }}">Bart Card</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
           aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -36,7 +36,7 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                   {% for li in list_types %}
-                    <a class="dropdown-item" href="{{url_for('movies', list_type=li.type)}}">{{li.name}}</a>
+                    <a class="dropdown-item" href="{{url_for('movies_page', select_list=li.type)}}">{{li.name}}</a>
                   {% endfor %}
                 </div>
               </li>
@@ -57,7 +57,7 @@
                     <button class="btn btn-danger my-2 my-sm-0" type="submit">Log Out</button>
                   </form>
                 {% else %}
-                  <a class="btn btn-success my-2 my-lg-0 " href="{{ url_for('login') }}">Login</a>
+                  <a class="btn btn-success my-2 my-lg-0 " href="{{ url_for('login_page') }}">Login</a>
                 {% endif %}
               </li>
           </ul>
