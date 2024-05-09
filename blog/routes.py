@@ -7,6 +7,7 @@ import tmdb_client
 import datetime
 import functools
 
+# Lista typów filmów
 LIST_TYPES = [
     {'name': "Now Playing", 'type': "now_playing"},
     {'name': "Top Rated", 'type': "top_rated"},
@@ -14,21 +15,26 @@ LIST_TYPES = [
     {'name': "Popular", 'type': "popular"}
 ]
 
+# Funkcja zwracająca listę typów filmów
 def get_list_types():
     return LIST_TYPES
 
+# Kontekst procesora w aplikacji
 @app.context_processor
 def inject_list_types():
     return dict(list_types=get_list_types())
 
+# Procesor narzędziowy
 @app.context_processor
 def utility_processor():
 
-    def tmdb_image_url(path,size):
-        return tmdb_client.get_poster_url(path,size)
+    # Funkcja zwracająca adres URL obrazu TMDB
+    def tmdb_image_url(path, size):
+        return tmdb_client.get_poster_url(path, size)
     
     return {'tmdb_image_url': tmdb_image_url}
 
+# Dekorator sprawdzający, czy użytkownik jest zalogowany
 def login_required(view_func):
     @functools.wraps(view_func)
     def check_permissions(*args,**kwargs):
@@ -37,8 +43,11 @@ def login_required(view_func):
         return redirect(url_for('login_page', next=request.path))
     return check_permissions
 
+# Strona logowania
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
+
+    # Logika logowania użytkownika
     form = LoginForm()
     errors = None
     next_url = request.args.get('next')
@@ -57,15 +66,21 @@ def login_page():
     return render_template('login_form.html', form=form, errors=errors)
 
 
+# Wylogowanie użytkownika
 @app.route('/logout/', methods=["GET","POST"])
 def logout():
+
+    # Logika wylogowywania użytkownika
     if request.method == "POST":
         session.clear()
         flash('You are now logged out', category='danger')
     return redirect(url_for('index'))   
 
+# Wyniki wyszukiwania
 @app.route('/search_results', methods=['GET'])
 def search():
+
+    # Logika wyszukiwania
     query = request.args.get('search_bar', '')
 
     if query:
@@ -83,7 +98,7 @@ def movies_page(select_list):
     valid_list_types = [lst['type'] for lst in LIST_TYPES]
 
     if select_list not in valid_list_types:
-        return redirect(url_for('movies', list_type='popular'))
+        return redirect(url_for('movies_page', select_list='popular'))
     
     movies = tmdb_client.get_movies(16, list_type=select_list)
 
@@ -99,16 +114,25 @@ def posts(limit=None):
     comments_count = {entry.id: len(entry.comments) for entry in all_posts}
     return render_template('homepage.html', all_posts=all_posts, comments_count=comments_count)
 
+# Strona główna
 @app.route('/')
 def index():
+    
+    # Wyświetlenie wpisów na stronie głównej
     return posts(limit=4)
 
+# Wyświetlenie wszystkich wpisów
 @app.route('/post_all') 
 def post_all():
+
+    # Wyświetlenie wszystkich wpisów
     return posts()
 
+# Szczegóły wpisu
 @app.route('/post/<post_id>', methods=['GET', 'POST'])
 def entry_details(post_id):
+
+    # Logika wyświetlania i dodawania komentarzy
     entry = Entry.query.get(post_id)
     all_comments = Comment.query.filter_by(entry_id=post_id).order_by(Comment.id.desc()).all()
     
@@ -130,14 +154,20 @@ def entry_details(post_id):
 
 
 
+# Dodanie nowego wpisu
 @app.route('/new_post', methods=['GET','POST'])
 @login_required
 def create_entry():
+
+    # Logika dodawania nowego wpisu
     return manage_entry(entry_id=None, action='Add a new Entry')
 
+# Edycja istniejącego wpisu
 @app.route('/edit_post/<int:entry_id>', methods=["GET", "POST"])
 @login_required
 def edit_entry(entry_id):
+    
+    # Logika edycji wpisu
     return manage_entry(entry_id, action='Modify a Entry')
 
 def manage_entry(entry_id, action):
@@ -161,16 +191,22 @@ def manage_entry(entry_id, action):
     
     return render_template('entry_form.html', form=form, errors=errors, action=action)
 
+# Wyświetlenie listy nieopublikowanych wpisów
 @app.route('/unpublished_list', methods=['GET'])
 @login_required
 def unpublished_list():
+
+    # Logika wyświetlania nieopublikowanych wpisów
     un_list = Entry.query.filter_by(is_published=False).order_by(Entry.pub_date.desc())
     return render_template('unpublished_list.html', un_list=un_list)
 
 
+# Usunięcie wpisu
 @app.route('/delete_entry', methods=['POST'])
 @login_required
 def delete_entry():
+
+    # Logika usuwania wpisu
     entry_id = request.form.get('entry_id') 
     if entry_id:
         entry = Entry.query.get_or_404(entry_id)

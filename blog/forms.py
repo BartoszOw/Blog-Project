@@ -5,20 +5,24 @@ from blog.models import Account
 from config import Config
 from werkzeug.routing import ValidationError
 
+
+# Formularz reprezentujący wpis
 class EntryForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
-    body = TextAreaField('Content', validators=[DataRequired()])
-    is_published = BooleanField('Is Published?')
+    title = StringField('Title', validators=[DataRequired()])  # Pole do wprowadzania tytułu, wymagane
+    body = TextAreaField('Content', validators=[DataRequired()])  # Pole do wprowadzania treści, wymagane
+    is_published = BooleanField('Is Published?')  # Pole wyboru, czy wpis jest opublikowany
 
+# Formularz reprezentujący komentarz
 class CommentForm(FlaskForm):
-    text = StringField('Text', validators=[DataRequired()])
+    text = StringField('Text', validators=[DataRequired()])  # Pole do wprowadzania tekstu komentarza, wymagane
 
+# Formularz reprezentujący logowanie
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    
+    username = StringField('Username', validators=[DataRequired()])  # Pole do wprowadzania nazwy użytkownika, wymagane
+    password = PasswordField('Password', validators=[DataRequired()])  # Pole do wprowadzania hasła, wymagane
 
+# Formularz reprezentujący kontakt
 class ContactForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    message = TextAreaField('Message', validators=[DataRequired()])
+    name = StringField('Name', validators=[DataRequired()])  # Pole do wprowadzania imienia, wymagane
+    email = StringField('Email', validators=[DataRequired(), Email()])  # Pole do wprowadzania adresu e-mail, wymagane, z walidacją poprawnego formatu adresu e-mail
+    message = TextAreaField('Message', validators=[DataRequired()])  # Pole do wprowadzania wiadomości, wymagane
