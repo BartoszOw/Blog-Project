@@ -54,5 +54,6 @@ class TestingApplication(unittest.TestCase):
         with self.app.test_client() as client:
             response = client.get('/post/100')
             self.assertEqual(response.status_code, 404)
+            
 if __name__ == '__main__':
     unittest.main()

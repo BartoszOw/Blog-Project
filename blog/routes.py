@@ -37,6 +37,44 @@ def login_required(view_func):
         return redirect(url_for('login_page', next=request.path))
     return check_permissions
 
+@app.route('/login', methods=['GET', 'POST'])
+def login_page():
+    form = LoginForm()
+    errors = None
+    next_url = request.args.get('next')
+    if request.method == "POST":
+        if form.validate_on_submit():
+            username = form.username.data
+            password = form.password.data
+            account = Account.query.filter_by(username=username).first()
+            if account and account.password == password:
+                session['logged_in'] = True
+                session.permanent = True
+                flash("You are now logged in.", category="success")
+                return redirect(next_url or url_for('index'))
+            else:
+                errors = 'Invalid username or password'
+    return render_template('login_form.html', form=form, errors=errors)
+
+
+@app.route('/logout/', methods=["GET","POST"])
+def logout():
+    if request.method == "POST":
+        session.clear()
+        flash('You are now logged out', category='danger')
+    return redirect(url_for('index'))   
+
+@app.route('/search_results', methods=['GET'])
+def search():
+    query = request.args.get('search_bar', '')
+
+    if query:
+        search_result = Entry.query.filter(Entry.title.ilike(f'%{query}%') | Entry.body.ilike(f"%{query}%")).all()
+    else:
+        return redirect(url_for('index'))
+
+    comments_count = {entry.id: len(entry.comments) for entry in search_result}
+    return render_template('search.html', search_result=search_result, query=query, comments_count=comments_count)
 
 @app.route('/<select_list>')
 @login_required
@@ -148,35 +186,6 @@ def delete_entry():
     else:
         return redirect(url_for('index'))
     
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login_page():
-    form = LoginForm()
-    errors = None
-    next_url = request.args.get('next')
-    if request.method == "POST":
-        if form.validate_on_submit():
-            username = form.username.data
-            password = form.password.data
-            account = Account.query.filter_by(username=username).first()
-            if account and account.password == password:
-                session['logged_in'] = True
-                session.permanent = True
-                flash("You are now logged in.", category="success")
-                return redirect(next_url or url_for('index'))
-            else:
-                errors = 'Invalid username or password'
-    return render_template('login_form.html', form=form, errors=errors)
-
-
-@app.route('/logout/', methods=["GET","POST"])
-def logout():
-    if request.method == "POST":
-        session.clear()
-        flash('You are now logged out', category='danger')
-    return redirect(url_for('index'))   
-
 
 @app.route('/contact', methods=['GET','POST'])
 def contact():

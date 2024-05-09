@@ -46,9 +46,9 @@
               </li>
               
           </ul>
-          <form class="form-inline my-2 my-lg-0">
-              <input class="form-control mr-sm-2" type="text" placeholder="Search.." aria-label="Szukaj">
-              <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+            <form class="form-inline" action="/search_results" method="GET">
+              <input class="form-control mr-sm-2" type="text" value="{% if query %}{{ query }}{% endif %}" placeholder="Search" aria-label="Search" name="search_bar">
+              <button button class="btn btn-outline-light" type="submit">Search</button>
           </form>
           <ul class="navbar-nav ml-auto"> 
               <li class="nav-item">
@@ -68,6 +68,7 @@
    {% block content %}
    {% endblock %}
  </main>
+ 
  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
    crossorigin="anonymous"></script>

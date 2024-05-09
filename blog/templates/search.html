@@ -1,77 +1,36 @@
 {% extends 'base.html' %}
 {% block style %}
-    <style>
-        body {
-        padding-top: 5rem;
-        }
-        .card {
-            margin-top: 15px;
-        }
-        .card-text {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        a {
-            margin-left: 5px;
-        }
-        .delete-btn {
-            border: none;
-            background: transparent;
-        }
-        .delete-btn:hover {
-            border: none;
-            background: transparent;
-        }
-    </style>
+<style>
+    body {
+    padding-top: 5rem;
+    }
+    .card {
+        margin-top: 15px;
+    }
+    .card-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    a {
+        margin-left: 5px;
+    }
+    .delete-btn {
+        border: none;
+        background: transparent;
+    }
+    .delete-btn:hover {
+        border: none;
+        background: transparent;
+    }
+</style>
 {% endblock style %}
 {% block content %}
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            {% if category == "success" %}
-                <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Congrats!</strong> {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <script>
-                    setTimeout(function() {
-                        var successAlert = document.getElementById('success-alert');
-                        successAlert.style.display = 'none';
-                    }, 2000);
-                </script>
-            {% endif %}
-            {% if category == "danger" %}
-                <div id="danger-alert" class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Oooops!</strong> {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <script>
-                    setTimeout(function() {
-                        var dangerAlert = document.getElementById('danger-alert');
-                        dangerAlert.style.display = 'none';
-                    }, 2000);
-                </script>
-            {% endif %}
-        {% endfor %}
-    {% endwith %}
-
-    {% if session.logged_in %}
-    <div class="block-inline">
-        <a class="nav-link d-inline " href="{{ url_for('create_entry') }}">
-            <button type="button" class="btn btn-outline-success">Add Entry</button>
-        </a>
-        <a class="nav-link d-inline " href="{{ url_for('unpublished_list') }}">
-            <button type="button" class="btn btn-outline-warning">Unpublished Entries</button>
-        </a>
+<div class="row">
+    <div class="col-lg-12 text-center">
+        <p class="lead mb-4">Search results for queries: <b>{{query}}</b></p>
     </div>
-    {% endif %}
- 
-    {% for post in all_posts %}
+{% for post in search_result %}
         <div class="card border-dark mb-3" >
             
             <h3 class="card-header">
@@ -99,7 +58,7 @@
             {% endif %}
             </h3>
             
-            <div class="card-body">
+            <div class="card-body text-dark">
                 <p class="card-text">
                     {{post.body}}
                 </p>
@@ -116,4 +75,4 @@
         
         </div>
     {% endfor %}
-{% endblock content%}
+{% endblock content %}
