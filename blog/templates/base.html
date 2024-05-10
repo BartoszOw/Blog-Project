@@ -51,16 +51,25 @@
               <button button class="btn btn-outline-light" type="submit">Search</button>
           </form>
           <ul class="navbar-nav ml-auto"> 
-              <li class="nav-item">
-                {% if session.logged_in %}
-                  <form class="form-inline my-2 my-lg-0" action="{{ url_for('logout') }}" method="POST">
-                    <button class="btn btn-danger my-2 my-sm-0" type="submit">Log Out</button>
-                  </form>
-                {% else %}
-                  <a class="btn btn-success my-2 my-lg-0 " href="{{ url_for('login_page') }}">Login</a>
+            {% if session.logged_in %}
+                {% if current_user %}
+                    <li class="nav-item ml-auto " style="margin-right: 5px;">
+                        <span class="navbar-text">
+                            Hi, {{ current_user.username }}!
+                        </span>
+                    </li>
                 {% endif %}
-              </li>
-          </ul>
+                <li class="nav-item ml-auto">
+                    <form class="form-inline my-2 my-lg-0" action="{{ url_for('logout') }}" method="POST">
+                        <button class="btn btn-danger my-2 my-sm-0" type="submit">Log Out</button>
+                    </form>
+                </li>
+            {% else %}
+                <li class="nav-item ml-auto">
+                    <a class="btn btn-success my-2 my-lg-0" href="{{ url_for('login_page') }}">Login</a>
+                </li>
+            {% endif %}
+        </ul>
       </div>
     </nav>
 

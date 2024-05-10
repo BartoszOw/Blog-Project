@@ -1,4 +1,4 @@
-from flask import render_template, request,abort, redirect, url_for, flash, session
+from flask import render_template, request,abort, redirect, url_for, flash, session, g
 from flask_login import login_user
 from blog import app
 from blog.models import Entry, Comment, db, Account
@@ -15,6 +15,12 @@ LIST_TYPES = [
     {'name': "Popular", 'type': "popular"}
 ]
 
+def show_username():
+    user_id = session.get('user_id')
+    current_user = Account.query.get(user_id)
+    return current_user
+
+
 # Funkcja zwracająca listę typów filmów
 def get_list_types():
     return LIST_TYPES
@@ -23,6 +29,7 @@ def get_list_types():
 @app.context_processor
 def inject_list_types():
     return dict(list_types=get_list_types())
+
 
 # Procesor narzędziowy
 @app.context_processor
@@ -58,12 +65,14 @@ def login_page():
             account = Account.query.filter_by(username=username).first()
             if account and account.password == password:
                 session['logged_in'] = True
+                session['user_id'] = account.id
                 session.permanent = True
                 flash("You are now logged in.", category="success")
                 return redirect(next_url or url_for('index'))
             else:
                 errors = 'Invalid username or password'
-    return render_template('login_form.html', form=form, errors=errors)
+    current_user = show_username()
+    return render_template('login_form.html', form=form, errors=errors, current_user=current_user)
 
 
 # Wylogowanie użytkownika
@@ -79,7 +88,7 @@ def logout():
 # Wyniki wyszukiwania
 @app.route('/search_results', methods=['GET'])
 def search():
-
+    current_user = show_username()
     # Logika wyszukiwania
     query = request.args.get('search_bar', '')
 
@@ -89,11 +98,12 @@ def search():
         return redirect(url_for('index'))
 
     comments_count = {entry.id: len(entry.comments) for entry in search_result}
-    return render_template('search.html', search_result=search_result, query=query, comments_count=comments_count)
+    return render_template('search.html',current_user=current_user, search_result=search_result, query=query, comments_count=comments_count)
 
 @app.route('/<select_list>')
 @login_required
 def movies_page(select_list):
+    current_user = show_username()
     
     valid_list_types = [lst['type'] for lst in LIST_TYPES]
 
@@ -102,9 +112,11 @@ def movies_page(select_list):
     
     movies = tmdb_client.get_movies(16, list_type=select_list)
 
-    return render_template('movies.html', movies=movies, list=LIST_TYPES, selected_list=select_list)
+    return render_template('movies.html',current_user=current_user, movies=movies, list=LIST_TYPES, selected_list=select_list)
 
 def posts(limit=None):
+
+    current_user = show_username()
 
     if limit is None:
         all_posts = Entry.query.filter_by(is_published=True).order_by(Entry.pub_date.desc()).all()
@@ -112,7 +124,7 @@ def posts(limit=None):
         all_posts = Entry.query.filter_by(is_published=True).order_by(Entry.pub_date.desc()).limit(limit).all()
 
     comments_count = {entry.id: len(entry.comments) for entry in all_posts}
-    return render_template('homepage.html', all_posts=all_posts, comments_count=comments_count)
+    return render_template('homepage.html',current_user=current_user, all_posts=all_posts, comments_count=comments_count)
 
 # Strona główna
 @app.route('/')
@@ -131,7 +143,7 @@ def post_all():
 # Szczegóły wpisu
 @app.route('/post/<post_id>', methods=['GET', 'POST'])
 def entry_details(post_id):
-
+    current_user = show_username()
     # Logika wyświetlania i dodawania komentarzy
     entry = Entry.query.get(post_id)
     all_comments = Comment.query.filter_by(entry_id=post_id).order_by(Comment.id.desc()).all()
@@ -150,7 +162,7 @@ def entry_details(post_id):
             return redirect(request.url)
         else:
             flash('Error adding comment. Please check your input.', 'error')
-    return render_template('entry_details.html', entry=entry, form=form, comments=all_comments)
+    return render_template('entry_details.html',current_user=current_user, entry=entry, form=form, comments=all_comments)
 
 
 
@@ -171,6 +183,7 @@ def edit_entry(entry_id):
     return manage_entry(entry_id, action='Modify a Entry')
 
 def manage_entry(entry_id, action):
+    current_user = show_username()
     entry = None
     if entry_id:
         entry = Entry.query.get_or_404(entry_id)
@@ -189,16 +202,16 @@ def manage_entry(entry_id, action):
     else:
         errors = form.errors
     
-    return render_template('entry_form.html', form=form, errors=errors, action=action)
+    return render_template('entry_form.html',current_user=current_user, form=form, errors=errors, action=action)
 
 # Wyświetlenie listy nieopublikowanych wpisów
 @app.route('/unpublished_list', methods=['GET'])
 @login_required
 def unpublished_list():
-
+    current_user = show_username()
     # Logika wyświetlania nieopublikowanych wpisów
     un_list = Entry.query.filter_by(is_published=False).order_by(Entry.pub_date.desc())
-    return render_template('unpublished_list.html', un_list=un_list)
+    return render_template('unpublished_list.html',current_user=current_user, un_list=un_list)
 
 
 # Usunięcie wpisu
@@ -225,6 +238,7 @@ def delete_entry():
 
 @app.route('/contact', methods=['GET','POST'])
 def contact():
+    current_user = show_username()
     form = ContactForm()
     if request.method == "POST":
         if form.validate_on_submit():
@@ -233,4 +247,4 @@ def contact():
             message = form.message.data
 
     
-    return render_template('contact.html', form=form)
+    return render_template('contact.html', current_user=current_user, form=form)
