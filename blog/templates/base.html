@@ -53,8 +53,8 @@
           <ul class="navbar-nav ml-auto"> 
             {% if session.logged_in %}
                 {% if current_user %}
-                    <li class="nav-item ml-auto " style="margin-right: 5px;">
-                        <span class="navbar-text">
+                    <li class="nav-item ml-auto" style="margin-right: 5px;">
+                        <span class="nav-link ml-auto">
                             Hi, {{ current_user.username }}!
                         </span>
                     </li>

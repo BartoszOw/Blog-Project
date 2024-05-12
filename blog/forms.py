@@ -24,5 +24,6 @@ class LoginForm(FlaskForm):
 # Formularz reprezentujący kontakt
 class ContactForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])  # Pole do wprowadzania imienia, wymagane
-    email = StringField('Email', validators=[DataRequired(), Email()])  # Pole do wprowadzania adresu e-mail, wymagane, z walidacją poprawnego formatu adresu e-mail
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    subject = StringField('Subject', validators=[DataRequired()])  # Pole do wprowadzania tytułu, wymagane
     message = TextAreaField('Message', validators=[DataRequired()])  # Pole do wprowadzania wiadomości, wymagane

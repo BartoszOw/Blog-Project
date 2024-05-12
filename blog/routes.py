@@ -1,7 +1,8 @@
 from flask import render_template, request,abort, redirect, url_for, flash, session, g
 from flask_login import login_user
-from blog import app
-from blog.models import Entry, Comment, db, Account
+from flask_mail import  Message
+from blog import app, mail, db 
+from blog.models import Entry, Comment,  Account
 from blog.forms import EntryForm, LoginForm, ContactForm, CommentForm
 import tmdb_client
 import datetime
@@ -29,6 +30,7 @@ def get_list_types():
 @app.context_processor
 def inject_list_types():
     return dict(list_types=get_list_types())
+
 
 
 # Procesor narzędziowy
@@ -242,9 +244,23 @@ def contact():
     form = ContactForm()
     if request.method == "POST":
         if form.validate_on_submit():
-            name = form.name.data
-            email = form.email.data
-            message = form.message.data
+            mes_name = form.name.data
+            mes_email = form.email.data
+            mes_subject = form.subject.data
+            mes_message = form.message.data
 
-    
+            msg = Message(
+                subject=mes_subject,
+                sender=mes_email,
+                recipients=[app.config['MAIL_USERNAME']]
+            )
+            msg.body = f"Message from: {mes_name} <{mes_email}>\n\n{mes_message}"
+
+            try:
+                mail.send(msg)
+                flash("Mail was sended", category="success")
+                return redirect(url_for('index'))
+            except Exception as e:
+                return str(e)
+            
     return render_template('contact.html', current_user=current_user, form=form)
