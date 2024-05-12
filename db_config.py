@@ -13,7 +13,7 @@ def generate_entries():
         post = Entry(
             title=fake.sentence(),  # Losowy tytuł
             body='\n'.join(fake.paragraphs(15)),  # Losowa treść składająca się z 15 akapitów
-            is_published=True  # Wpis jest opublikowany
+            is_published=False  # Wpis jest opublikowany
         )
         db.session.add(post)
     db.session.commit()
@@ -54,9 +54,9 @@ def generate_accounts():
     db.session.commit()
 
 
-#with app.app_context():
+with app.app_context():
 #    generate_accounts()
-#    generate_entries()
+    generate_entries()
 #    generate_comments()
 
 
