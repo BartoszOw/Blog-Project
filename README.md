@@ -41,6 +41,7 @@ Before running the application, make sure you have installed:
 - requests
 - dotenv
 - Flask-WTF
+- Flask-Mail
 
 ## Running the Application:
 
