@@ -16,9 +16,11 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # Identyfikator komentarza
     text = db.Column(db.Text, nullable=False)  # Treść komentarza
     entry_id = db.Column(db.Integer, db.ForeignKey('entry.id'), nullable=False)  # Klucz obcy do powiązanego wpisu
+    account_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)  # Klucz obcy do powiązanego konta użytkownika
 
 # Model reprezentujący konto użytkownika
 class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # Identyfikator konta
     username = db.Column(db.String(100), unique=True, nullable=False)  # Nazwa użytkownika
     password = db.Column(db.String(100), nullable=False)  # Hasło użytkownika
+    comments = db.relationship('Comment', backref='account', lazy=True)  # Relacja jeden do wielu z komentarzami

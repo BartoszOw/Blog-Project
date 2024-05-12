@@ -85,7 +85,10 @@ def logout():
     if request.method == "POST":
         session.clear()
         flash('You are now logged out', category='danger')
-    return redirect(url_for('index'))   
+        if request.referrer:
+            return redirect(request.referrer)
+        else:
+            return redirect(url_for('index'))   
 
 # Wyniki wyszukiwania
 @app.route('/search_results', methods=['GET'])
