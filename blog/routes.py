@@ -3,7 +3,7 @@ from flask_login import login_user
 from flask_mail import  Message
 from blog import app, mail, db 
 from blog.models import Entry, Comment,  Account
-from blog.forms import EntryForm, LoginForm, ContactForm, CommentForm
+from blog.forms import EntryForm, LoginForm, ContactForm, CommentForm, RegisterForm
 import tmdb_client
 import datetime
 import functools
@@ -52,6 +52,49 @@ def login_required(view_func):
         return redirect(url_for('login_page', next=request.path))
     return check_permissions
 
+
+@app.route('/register', methods=['GET','POST'])
+def register_page():
+    form = RegisterForm()
+
+    if request.method == "POST":
+        if form.validate_on_submit():
+            name = form.name.data
+            email = form.email.data
+            username = form.username.data
+            password = form.password.data
+            confirm_password = form.confirm_password.data
+
+            if confirm_password != password :
+                flash("The passwords don't match. Please try again.", category="danger")
+                return render_template('register_form.html', form=form)
+            
+            existing_username = Account.query.filter_by(username=username).first()
+            if existing_username:
+                flash("This username is already taken. Please choose a different one.", category="danger")
+                return render_template('register_form.html', form=form)
+
+            existing_email = Account.query.filter_by(email=email).first()
+            if existing_email:
+                flash("This email address is already registered. Please use a different one.", category="danger")
+                return render_template('register_form.html', form=form)
+
+            
+            account = Account(
+                name=name,
+                email=email,
+                username=username,
+                password=password
+            )
+
+            db.session.add(account)
+            db.session.commit()
+
+            flash("You are now registered.", category="success")
+            return redirect(url_for('login_page'))
+    
+    return render_template('register_form.html', form=form)
+    
 # Strona logowania
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
@@ -89,6 +132,19 @@ def logout():
             return redirect(request.referrer)
         else:
             return redirect(url_for('index'))   
+
+
+@app.route('/account_details', methods=['GET','POST'])
+def account_details():
+    current_user = show_username()
+    acc = session.get('user_id')
+    account = Account.query.filter_by(id=acc).first()
+    entries_acc = Entry.query.filter_by(account_id=acc)
+    comments_acc = Comment.query.filter_by(account_id=acc)
+
+    if not acc:
+        return redirect(url_for('index'))
+    return render_template('account_info.html',comments_acc=comments_acc, current_user=current_user,entries_acc=entries_acc, account=account)
 
 # Wyniki wyszukiwania
 @app.route('/search_results', methods=['GET'])
@@ -161,6 +217,7 @@ def entry_details(post_id):
         if form.validate_on_submit():
             text = form.text.data
             comment = Comment(text=text, entry_id=post_id)
+            comment.account_id = session.get('user_id')
             db.session.add(comment)
             db.session.commit()
             flash('Your comment has been added!', category='success')
@@ -200,6 +257,7 @@ def manage_entry(entry_id, action):
         if not entry:
             entry = Entry()
         form.populate_obj(entry)
+        entry.account_id = session.get('user_id')
         db.session.add(entry)
         db.session.commit()
         flash("Successfully Entry Added" if not entry_id else "Successfully Entry Modified", category="success")
@@ -214,8 +272,9 @@ def manage_entry(entry_id, action):
 @login_required
 def unpublished_list():
     current_user = show_username()
+    user_id = session.get('user_id')
     # Logika wyświetlania nieopublikowanych wpisów
-    un_list = Entry.query.filter_by(is_published=False).order_by(Entry.pub_date.desc())
+    un_list = Entry.query.filter_by(is_published=False, account_id=user_id).order_by(Entry.pub_date.desc())
     return render_template('unpublished_list.html',current_user=current_user, un_list=un_list)
 
 

@@ -19,7 +19,7 @@
 <body>
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="{{ url_for('index') }}">Bart Card</a>
+      <a class="navbar-brand" href="{{ url_for('index') }}">Bart Blog</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
           aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -42,7 +42,7 @@
               </li>
               
               <li class="nav-item">
-                <a class="btn btn-info " href="{{url_for('contact')}}" role="button">Contact</a>
+                <a class="btn btn-outline-warning " href="{{url_for('contact')}}" role="button">Contact</a>
               </li>
               
           </ul>
@@ -54,10 +54,13 @@
             {% if session.logged_in %}
                 {% if current_user %}
                     <li class="nav-item ml-auto" style="margin-right: 5px;">
-                        <span class="nav-link ml-auto">
-                            Hi, {{ current_user.username }}!
-                        </span>
+                      <div class="btn-group">
+                        <a type="button" href="{{url_for('account_details')}}"  class="btn btn-outline-info " aria-expanded="false">
+                          {{current_user.name}}
+                        </a>
+                        </div>
                     </li>
+
                 {% endif %}
                 <li class="nav-item ml-auto">
                     <form class="form-inline my-2 my-lg-0" action="{{ url_for('logout') }}" method="POST">
@@ -74,6 +77,38 @@
     </nav>
 
  <main role="main" class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            {% if category == "success" %}
+                <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Congrats!</strong> {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <script>
+                    setTimeout(function() {
+                        var successAlert = document.getElementById('success-alert');
+                        successAlert.style.display = 'none';
+                    }, 2000);
+                </script>
+            {% endif %}
+            {% if category == "danger" %}
+                <div id="danger-alert" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Oooops!</strong> {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <script>
+                    setTimeout(function() {
+                        var dangerAlert = document.getElementById('danger-alert');
+                        dangerAlert.style.display = 'none';
+                    }, 2000);
+                </script>
+            {% endif %}
+        {% endfor %}
+    {% endwith %}
    {% block content %}
    {% endblock %}
  </main>

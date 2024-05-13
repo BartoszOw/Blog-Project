@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, BooleanField, PasswordField
-from wtforms.validators import DataRequired, Email
+from wtforms.validators import DataRequired, Email, Length, EqualTo
 from blog.models import Account
 from config import Config
 from werkzeug.routing import ValidationError
@@ -20,6 +20,13 @@ class CommentForm(FlaskForm):
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])  # Pole do wprowadzania nazwy użytkownika, wymagane
     password = PasswordField('Password', validators=[DataRequired()])  # Pole do wprowadzania hasła, wymagane
+
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(),Length(min=3, max=100)])
+    name = StringField('Name',  validators=[DataRequired(),Length(min=2, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
 
 # Formularz reprezentujący kontakt
 class ContactForm(FlaskForm):

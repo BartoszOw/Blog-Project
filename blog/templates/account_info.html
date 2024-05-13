@@ -1,19 +1,8 @@
 {% extends 'base.html' %}
 {% block style %}
     <style>
-        body {
-        padding-top: 5rem;
-        }
-        .card {
-            margin-top: 15px;
-        }
-        .card-text {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        a {
-            margin-left: 5px;
+        .container{
+            margin-top: 100px;
         }
         .delete-btn {
             border: none;
@@ -26,9 +15,37 @@
     </style>
 {% endblock style %}
 {% block content %}
-
+<div class="container">
+    <div class="card border-dark mb-3">
+        <div class="card-header text-center">
+            <h4>Account Information</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-6">
+                    <p><strong>Name:</strong> {{ account.name }}</p>
+                </div>
+                <div class="col-sm-6">
+                    <p><strong>Username:</strong> {{ account.username }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <p><strong>Email:</strong> {{ account.email }}</p>
+                </div>
+                <div class="col-sm-6">
+                    <p><strong>Password:</strong> {{ account.password }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <p><strong>Join Date:</strong> {{ account.join_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
     {% if session.logged_in %}
-    <div class="block-inline">
+    <div class="block-inline" style="margin-bottom: 10px;">
         <a class="nav-link d-inline " href="{{ url_for('create_entry') }}">
             <button type="button" class="btn btn-outline-success">Add Entry</button>
         </a>
@@ -37,14 +54,16 @@
         </a>
     </div>
     {% endif %}
-    {% for post in all_posts %}
+    <div class="card-header text-center" style="margin-bottom: 10px;">
+        <h4>Entries</h4>
+    </div>
+    {% for post in entries_acc %}
         <div class="card border-dark mb-3" >
             
             <h3 class="card-header">
                 <a href="{{url_for('entry_details', post_id=post.id)}}" style="color: inherit; text-decoration: inherit;">
                 {{post.title}} 
                 </a> 
-                <span class="text-muted" style="font-size: 0.6em;">By {{post.account.name}} ({{post.account.username}})</span>
                 {% if session.logged_in and post.account_id == session.get('user_id') %}
             <a class="modify-icon float-right" href={{url_for('edit_entry', entry_id=post.id)}}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
@@ -73,13 +92,10 @@
             </div>
             <div class="card-footer text-muted d-flex justify-content-between">
                 <div>{{post.pub_date.strftime('%Y-%m-%d %H:%M')}}</div>
-                <div class="float-right">
-                    {{comments_count[post.id]}}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-left-fill" viewBox="0 0 16 16">
-                        <path d="M2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-                    </svg>
-                </div>
             </div>
+        
         </div>
     {% endfor %}
-{% endblock content%}
+</div>
+  
+{% endblock content %}
