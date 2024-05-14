@@ -57,12 +57,6 @@ Before running the application, make sure you have installed:
    ``flask run``
 6. Open a web browser and go to `http://127.0.0.1:5000/`.
 
-## Test Account:
-
-To log in to the application, use the following credentials:
-
-- **Username**: Test
-- **Password**: test
 
 ## NOTE:
 
